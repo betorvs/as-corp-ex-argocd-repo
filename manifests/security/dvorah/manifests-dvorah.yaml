@@ -1,0 +1,262 @@
+---
+# Source: dvorah/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dvorah
+  labels:
+    helm.sh/chart: dvorah-0.3.0
+    app.kubernetes.io/name: dvorah
+    app.kubernetes.io/instance: dvorah
+    app.kubernetes.io/version: "0.3.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: dvorah/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dvorah-config
+data:
+  docker-config.json: |
+    "{\"credHelpers\": {\"123456789123.dkr.ecr.us-east-1.amazonaws.com\": \"ecr-login\"}}\n"
+  config.yaml: |
+    globalMode: "audit"
+    globalProvider: "open-registry"
+    globalRegistries: 
+      - "index.docker.io/betorvs"
+    globalPublicKey: |
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXBC/tG86ZkNXCMSODNnqWSv94czb
+      QwYxG2qpcX90HRs3amRFfKMFcKWDNf3AmFmGRVySxvZYZ6ZR7WqYRTMm5Q==
+      -----END PUBLIC KEY-----
+    policies: 
+      - name: "keyless dvorah"
+        pattern: "ghcr.io/betorvs/dvorah:*"
+        provider: "open-registry"
+        registries:
+          - "ghcr.io/betorvs/dvorah"
+        mode: "deny"
+        identity_regex: "^https://github.com/betorvs/dvorah/.github/workflows/release.yaml@refs/(heads/main|tags/v.*)$"
+        issuer: "https://token.actions.githubusercontent.com"
+      - name: "keyless argocd"
+        pattern: "quay.io/argoproj/argocd:*"
+        provider: "open-registry"
+        registries:
+          - "quay.io/argoproj/argocd"
+        mode: "deny"
+        identity_regex: "https://github.com/argoproj/argo-cd/.github/workflows/image-reuse.yaml@refs/tags/v"
+        issuer: "https://token.actions.githubusercontent.com"
+      - name: "keyless dexidp"
+        pattern: "ghcr.io/dexidp/dex:*"
+        provider: "open-registry"
+        registries:
+          - "ghcr.io/dexidp/dex"
+        mode: "deny"
+        identity_regex: "https://github.com/dexidp/dex/.github/workflows/artifacts.yaml@refs/tags/v"
+        issuer: "https://token.actions.githubusercontent.com"
+---
+# Source: dvorah/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dvorah
+  labels:
+    helm.sh/chart: dvorah-0.3.0
+    app.kubernetes.io/name: dvorah
+    app.kubernetes.io/instance: dvorah
+    app.kubernetes.io/version: "0.3.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8443
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 8080
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app.kubernetes.io/name: dvorah
+    app.kubernetes.io/instance: dvorah
+---
+# Source: dvorah/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dvorah
+  labels:
+    helm.sh/chart: dvorah-0.3.0
+    app.kubernetes.io/name: dvorah
+    app.kubernetes.io/instance: dvorah
+    app.kubernetes.io/version: "0.3.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dvorah
+      app.kubernetes.io/instance: dvorah
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: dvorah-0.3.0
+        app.kubernetes.io/name: dvorah
+        app.kubernetes.io/instance: dvorah
+        app.kubernetes.io/version: "0.3.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: dvorah
+      containers:
+        - name: dvorah
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "ghcr.io/betorvs/dvorah:0.4.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - -cert=/etc/dvorah/certs/tls.crt
+            - -key=/etc/dvorah/certs/tls.key
+            - -port=8443
+            - -adm-port=8080
+            - -log-level=debug
+            - -digest-cache-size=1000
+            - -digest-cache-ttl=12
+            - -tag-cache-size=1000
+            - -tag-cache-ttl=12
+            - -owner-cache-size=1000
+            - -owner-cache-ttl=12
+            - -use-tag-cache=true
+            - -policy-config=/config/config.yaml
+          env:
+            - name: DVORAH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: BEE_JOB
+              value: cosign-review
+            - name: BEE_SERVICE
+              value: dvorah.dvorah.svc
+            - name: BEE_RESOURCE_KIND
+              value: statefulset
+            - name: BEE_PORT
+              value: "8443"
+            - name: HOME
+              value: /home/dvorah
+          ports:
+            - name: http
+              containerPort: 8443
+              protocol: TCP
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+          resources:
+            limits:
+              memory: 48Mi
+            requests:
+              cpu: 100m
+              memory: 48Mi
+          volumeMounts:
+            - name: dvorah-certs
+              mountPath: "/etc/dvorah/certs"
+              readOnly: true
+            - mountPath: /.docker/config.json
+              name: dvorah-config-volume
+              subPath: config.json
+            - mountPath: /config/config.yaml
+              name: dvorah-config-volume
+              subPath: config.yaml
+            - name: dvorah-home 
+              mountPath: /home/dvorah
+      volumes:
+        - name: dvorah-certs
+          secret:
+            secretName: dvorah-certificates
+        - name: dvorah-home
+          emptyDir: {}
+        - name: dvorah-config-volume
+          configMap:
+            name: dvorah-config
+            items:
+            - key: docker-config.json
+              path: docker-config.json
+            - key: config.yaml
+              path: config.yaml
+---
+# Source: dvorah/templates/validatingwebhook.yaml
+kind: ValidatingWebhookConfiguration
+apiVersion: admissionregistration.k8s.io/v1
+metadata:
+  name: dvorah
+  annotations:
+    # Inject from ca-root Certificate in devops namespace (our cert-manager namespace)
+    cert-manager.io/inject-ca-from: devops/ca-root
+  labels:
+    helm.sh/chart: dvorah-0.3.0
+    app.kubernetes.io/name: dvorah
+    app.kubernetes.io/instance: dvorah
+    app.kubernetes.io/version: "0.3.0"
+    app.kubernetes.io/managed-by: Helm
+webhooks:
+  - name: dvorah.dvorah.svc
+    clientConfig:
+      service:
+        namespace: dvorah
+        name: dvorah
+        path: /validate
+        port: 8443
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZTVENDQXpHZ0F3SUJBZ0lSQVB2V0tRUStsN1kxVzBlMVBJQ29NZTB3RFFZSktvWklodmNOQVFFTEJRQXcKUGpFYk1Ca0dBMVVFQ2hNU1RXbHVhR0VnUlcxd2NtVnpZU0JNVkVSQk1SOHdIUVlEVlFRREV4Wk5hVzVvWVNCRApRU0JNYjJOaGJDQkpiblJsY201aE1CNFhEVEkyTURVek1URXpNalUwTVZvWERUTTJNRFV6TVRFek1qVTBNVm93ClBqRWJNQmtHQTFVRUNoTVNUV2x1YUdFZ1JXMXdjbVZ6WVNCTVZFUkJNUjh3SFFZRFZRUURFeFpOYVc1b1lTQkQKUVNCTWIyTmhiQ0JKYm5SbGNtNWhNSUlDSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQQowakZHVkV3QWZ1WEx1bnNlYXQ1am1DR1RnSk1uQndwbjEvbUhma0F4dzNjRXZyNWpkV3RFNll0cFJUSFhjK1MzCnB0WE1kSGkycFNyY3hiQktyWEZCaVdOSisyRlBlWUZYMnpISERINEtxbDhrcVlPMGxqeEg4ak9razhoSkN5SnoKU3pTSFJOM2RqU1NwWFluQkZRNUxPc0FJKzlPYUErRUZMakk3aGZBdWhzcGJRUWFKaUlvUk1oY3JqdHE0dU9vcQo5dy8yTnVYdlZRQjVkNjdnU2h6MklsWGlrTStJTDNzai82TVc5bnNaUXlwcXBqdFFUS3VLaURrOGNKNWxJR3U4CnRDU0JTVEMzc0dieWo5VVNsNU1CbUpiRWh3NVoxNUxiWjl0YW9kT1k1MTFNRzUxZHg5bUlOY2h5TWJRS25uVzAKTFZXa1pRYUVOT3kyeW0yalAwSm4zMmNrMjZ0SmFHRjJqY1hKZndXbXVuQXE1dmJBdjZsUHZvbjFkZ3l5UnFGQgpSVjdHRithSDdqQytpVTZ4aXc2VitHcllyRmo0eW42Z2JWS1A5SVJOWXF0VUd5eHBpZ05LbnlmbU1Pd3laZWR2Cnd5alBSa3cvQWY0dk9LOThhZytuZWxCbzd1Y1l4T0VLWmxGM2J2Zy81ZXZTZ201QUpCdFFFR2szYjJvbEE4NkcKUFIvZGd6WEt0NmFkWmNjMDBVdEdWN1c4dVZSSHhPSGphdUowYWwrWHdOT2tqZTRZZ1dSOFdJZUoyUFdnZ3RZSQpQRGF6Z3hzK05RU1JmTy84d2FxLzBMSHdKdEE5VnRFa0plWnR4VDg1dERiMVpjSlMxOTBSZ3JqUzdqbEZHamVWCmdzUE5OdjU2VGxwUHBBN0laYkdWL2ZvWW4vMlJFTFY2QmpVbEtVUzlIcnNDQXdFQUFhTkNNRUF3RGdZRFZSMFAKQVFIL0JBUURBZ0VHTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlAwMUhSRnd2TzY4WnJZUAovRjF5T0o0YUFHeEJNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUNBUUNFZys3YVM2OTZZM1cydFh4SG1iN29Bdjg5CkI1VUxDOUt6c29nNERlRytqYkFEN2Y0TXNCeW9WNmt5YjBJNVRFdzVLS202a0JGaUozMCtZTmNwRzFGUG44K0QKVjhMTWZpQzlHWHFBelcvKzdRUHo3djRreU9yUVpGd3lmWGxsdEliQUJQTi9FbUVFeDI0OVVQdUhJbTNlcUthcwoxWm13SHZhdkYxYWYzSnU5b2lhMXBlVUw3dm1qbkx1RVp2TzBZNXBaekNqUXpDM2NNd3dZd3ovZkdBRDA2TTZqCmVPVU50NmQ5SVhLY3VUNC9VTXBxc2txbzR0L3F2dmVUc1E1VXhCcVAzb1FNelZJT2pIKzRCNzN0elN2R0ZlaEIKck92c2R3NlRtRDlLdkF5bGVaUlliK3lNQVpRQ09ndTZBSDBoQTJkVHBlaWtXL21sU1BmUDRCSi8xYmQrbkk0MAo4OUtieVcyZDBTZlFEeFVpajU3WUFzUk5xYUJwZ2pSMDhaeFAzSTJaZ3BBd1N3R3NGZ213WWhLcldxWjU0UWhqCk5zSTgyMHJwU2IwRU9RcGM5eUc2ZGkrcFYrbWxWWm1RaGlRTGZPdTVVazh4WTEzUmg2emdJN3RPSWlXcXI5aTQKVXEycEc3L1RmWmRKQzl6MVVDdWhOWVhoT2wzZGptaUhFSVZieUl3bGZ4L1Y1VlNISWJmZW9YMFQ2Z0xocUNVawpxNWl5cStkcVhHR2ZKczZ6cUdBS2JBREloNlhUWGpKMFRaUVlTakhGM3ZLQXpnbm9qYW9vRVgxbFRNV1ZQVE1xCkZDK0hhTkdxRk5jNlZneE8rOXkxUWVVM0wveDdCazBQejZBRkQ4WHdTYXVWTjYweEdBSE55QzB3ODBiYWRubkgKbzJuNXZYR1RqVW41Y0h1NTZRPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+      - apiGroups:
+          - apps
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - deployments
+          - replicasets
+          - daemonsets
+          - statefulsets
+      - apiGroups:
+          - batch
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - jobs
+          - cronjobs
+    sideEffects: None
+    failurePolicy: Ignore
+    matchPolicy: Equivalent
+    timeoutSeconds: 5
+    admissionReviewVersions: ["v1"]
