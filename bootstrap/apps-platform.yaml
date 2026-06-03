@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2" 
+spec:
+  project: platform
+  source:
+    repoURL: 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+    targetRevision: HEAD
+    path: apps/platform
+    directory:
+      recurse: true
+      include: '*.yaml'
+  destination:
+    server: 'https://default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

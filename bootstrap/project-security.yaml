@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: security
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  sourceRepos:
+    - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+  sourceNamespaces: []
+  destinations: []
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
