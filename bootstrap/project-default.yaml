@@ -12,6 +12,3 @@ spec:
   clusterResourceWhitelist:
   - group: '*'
     kind: 'Application'
-  namespaceResourceBlacklist:
-  - group: '*'
-    kind: '*'
