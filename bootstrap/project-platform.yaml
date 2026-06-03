@@ -8,7 +8,9 @@ spec:
   sourceRepos: 
     - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
   sourceNamespaces: []
-  destinations: []
+  destinations: 
+  - server: "*"
+    namespace: "*"
   clusterResourceWhitelist:
   - group: '*'
     kind: '*'
