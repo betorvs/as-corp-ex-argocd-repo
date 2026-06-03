@@ -5,10 +5,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  sourceRepos: []
-  sourceNamespaces: []
-  destinations: 
-  - argocd
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
   clusterResourceWhitelist:
   - group: '*'
-    kind: 'Application'
+    kind: '*'
