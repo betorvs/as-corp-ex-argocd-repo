@@ -8,6 +8,7 @@ spec:
   sourceRepos:
     - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
     - 'oci://ghcr.io/betorvs/charts/dvorah'
+    - 'oci://ghcr.io/betorvs/charts/sec-policies'
   sourceNamespaces: []
   destinations:
   - server: "*"
