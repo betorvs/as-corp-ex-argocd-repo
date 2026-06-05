@@ -12,6 +12,7 @@ jobs:
       - name: check projets
         run: |
             set -x
+            yq version
             export allowed_file="./bootstrap/bootstrap.yaml"
 
             for file in $(find . -type f \( -name "*.yaml" -o -name "*.yml" \)); do
