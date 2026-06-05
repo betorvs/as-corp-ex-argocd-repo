@@ -7,6 +7,7 @@ metadata:
 spec:
   sourceRepos:
     - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+    - 'https://falcosecurity.github.io/charts'
     - 'oci://ghcr.io/betorvs/charts/dvorah'
     - 'oci://ghcr.io/betorvs/charts/sec-policies'
   sourceNamespaces: []
