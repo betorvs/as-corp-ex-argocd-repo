@@ -11,19 +11,4 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: check projets
         run: |
-            set -x
-            
-            export allowed_file="./bootstrap/bootstrap.yaml"
-
-            for file in $(find . -type f \( -name "*.yaml" -o -name "*.yml" \)); do
-                yq -e 'select(.spec.project == "default")' "$file" >/dev/null 2>&1
-                if [[ "$?" -eq "0" ]]; then
-                    echo "debug: $file and $allowed_file"
-                    if [ "$file" != "$allowed_file" ]; then 
-                        cat $file
-                        echo "Error: project default not allowed: $file"
-                        exit 1
-                    fi
-                fi
-            done
-            echo "All good"
+            bash ./check.sh
