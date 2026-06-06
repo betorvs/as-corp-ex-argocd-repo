@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: security
+  name: batman
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   sourceRepos:
     - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
-    - 'https://falcosecurity.github.io/charts'
-    - 'oci://ghcr.io/betorvs/charts/dvorah'
-    - 'oci://ghcr.io/betorvs/charts/sec-policies'
   sourceNamespaces: []
   destinations:
-  - server: "*"
-    namespace: "*"
+  - namespace: '!kube-system'
+    server: '*'
+  - namespace: '*'
+    server: '*'
   clusterResourceWhitelist:
-  - group: '*'
-    kind: '*'
+  - group: ''
+    kind: Namespace
+    name: teamb-*
   namespaceResourceBlacklist:
   - group: argoproj.io
     kind: AppProject
