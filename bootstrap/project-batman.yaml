@@ -14,8 +14,9 @@ spec:
   - namespace: '*'
     server: '*'
   clusterResourceWhitelist:
-  - group: '*'
-    kind: '*'
-  clusterResourceBlacklist:
+  - group: ''
+    kind: Namespace
+    name: teamb-*
+  namespaceResourceBlacklist:
   - group: argoproj.io
     kind: AppProject

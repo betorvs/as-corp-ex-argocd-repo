@@ -14,7 +14,7 @@ spec:
   destinations:
   - server: "*"
     namespace: "*"
-  clusterResourceBlacklist:
+  namespaceResourceBlacklist:
   - group: argoproj.io/v1alpha1
     kind: AppProject
   clusterResourceWhitelist:
