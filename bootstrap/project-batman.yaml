@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: batman
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  sourceRepos:
+    - 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+  sourceNamespaces: []
+  destinations:
+  - namespace: '!kube-system'
+    server: '*'
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  clusterResourceBlacklist:
+  - group: argoproj.io
+    kind: AppProject
