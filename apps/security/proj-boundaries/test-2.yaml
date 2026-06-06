@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: elevate-privileges
+  name: test-2
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
