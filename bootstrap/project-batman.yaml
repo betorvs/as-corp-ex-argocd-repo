@@ -18,5 +18,5 @@ spec:
     kind: Namespace
     name: teamb-*
   namespaceResourceBlacklist:
-  - group: argoproj.io
+  - group: argoproj.io/v1alpha1
     kind: AppProject
