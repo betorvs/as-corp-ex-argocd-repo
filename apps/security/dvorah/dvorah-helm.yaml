@@ -28,6 +28,8 @@ spec:
               - "public.ecr.aws/docker/library/redis:8.2.3-alpine"
               - "quay.io/jetstack/trust-manager:v0.22.1"
               - "quay.io/jetstack/trust-pkg-debian-bookworm:20230311-deb12u1.6"
+              - "hashicorp/vault-k8s:1.7.4"
+              - "hashicorp/vault:2.0.2"
             globalPublicKey: |
               -----BEGIN PUBLIC KEY-----
               MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXBC/tG86ZkNXCMSODNnqWSv94czb
