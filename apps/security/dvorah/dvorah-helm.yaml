@@ -10,7 +10,7 @@ spec:
   source:
     chart: dvorah
     repoURL: oci://ghcr.io/betorvs/charts/dvorah
-    targetRevision: 0.6.1
+    targetRevision: 0.6.2
     helm:
       releaseName: dvorah
       values: |
