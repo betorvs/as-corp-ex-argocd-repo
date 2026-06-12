@@ -10,6 +10,7 @@ spec:
     - 'https://falcosecurity.github.io/charts'
     - 'oci://ghcr.io/betorvs/charts/dvorah'
     - 'oci://ghcr.io/betorvs/charts/sec-policies'
+    - 'https://helm.releases.hashicorp.com'
   sourceNamespaces: []
   destinations:
   - server: "*"
