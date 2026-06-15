@@ -16,6 +16,8 @@ spec:
       values: |
         certificate:
           enabled: true
+        env:
+          enabled: true
         args:
           useTagCache: true
           policyConfig: true
