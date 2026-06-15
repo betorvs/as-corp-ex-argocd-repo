@@ -10,7 +10,7 @@ spec:
   source:
     chart: dvorah
     repoURL: oci://ghcr.io/betorvs/charts/dvorah
-    targetRevision: 0.6.2
+    targetRevision: 0.7.0
     helm:
       releaseName: dvorah
       values: |
@@ -69,7 +69,7 @@ spec:
                 identity_regex: "https://github.com/falcosecurity/"
                 issuer: "https://token.actions.githubusercontent.com"
               - name: "keyless external-secrets"
-                pattern: "ghcr.io/external-secrets/external-secrets"
+                pattern: "ghcr.io/external-secrets/external-secrets*"
                 provider: "open-registry"
                 registries:
                   - "ghcr.io/external-secrets"
