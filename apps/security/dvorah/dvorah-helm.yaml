@@ -74,7 +74,7 @@ spec:
                 registries:
                   - "ghcr.io/external-secrets"
                 mode: "deny"
-                identity_regex: "^https://github\.com/external-secrets/external-secrets/\.github/workflows/release\.yml@"
+                identity_regex: "^https://github.com/external-secrets/external-secrets/.github/workflows/release.yml@"
                 issuer: "https://token.actions.githubusercontent.com"
               - name: "cert manager"
                 pattern: "quay.io/jetstack/cert-manager*"
