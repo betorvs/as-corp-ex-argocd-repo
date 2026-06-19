@@ -60,7 +60,7 @@ args:
         identity_regex: "https://github.com/dexidp/dex/.github/workflows/artifacts.yaml@refs/tags/v"
         issuer: "https://token.actions.githubusercontent.com"
       - name: "keyless falco"
-        pattern: "docker.io/falcosecurity*"
+        pattern: "docker.io/falcosecurity/*"
         provider: "open-registry"
         registries:
           - "docker.io/falcosecurity"
