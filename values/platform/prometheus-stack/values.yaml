@@ -1,0 +1,30 @@
+## 
+crds:
+  enabled: false
+
+kubernetesServiceMonitors:
+  enabled: false
+kubeApiServer:
+  enabled: false
+kubeLet:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+
+
+grafana:
+  additionalDataSources: 
+    - name: Loki 
+      type: loki
+      access: proxy
+      url: http://loki-gateway.logging.svc.cluster.local:80
+      editable: false
+      jsonData:
+        maxLines: 1000
+        timeout: 60
