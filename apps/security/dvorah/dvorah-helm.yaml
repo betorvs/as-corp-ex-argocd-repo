@@ -8,13 +8,16 @@ metadata:
 spec:
   project: security
   source:
-    chart: dvorah
-    repoURL: oci://ghcr.io/betorvs/charts/dvorah
-    targetRevision: 0.7.0
-    helm:
-      releaseName: dvorah
-      valueFiles:
-        - values/security/dvorah/values.yaml
+    - repoURL: 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+      targetRevision: HEAD
+      ref: git-values
+    - chart: dvorah
+      repoURL: oci://ghcr.io/betorvs/charts/dvorah
+      targetRevision: 0.7.0
+      helm:
+        releaseName: dvorah
+        valueFiles:
+          - $git-values/values/security/dvorah/values.yaml
   destination:
     server: "https://kubernetes.default.svc"
     namespace: dvorah
