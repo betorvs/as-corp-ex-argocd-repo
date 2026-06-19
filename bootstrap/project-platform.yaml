@@ -11,6 +11,7 @@ spec:
     - 'oci://quay.io/jetstack/charts/trust-manager'
     - 'https://charts.external-secrets.io'
     - 'https://grafana-community.github.io/helm-charts'
+    - 'https://prometheus-community.github.io/helm-charts'
   sourceNamespaces: []
   destinations: 
   - server: "*"

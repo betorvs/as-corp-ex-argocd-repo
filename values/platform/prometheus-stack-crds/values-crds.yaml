@@ -1,0 +1,27 @@
+# disable all
+prometheusOperator:
+  enabled: false
+prometheus:
+  enabled: false
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+kubernetesServiceMonitors:
+  enabled: false
+kubeApiServer:
+  enabled: false
+kubeLet:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+nodeExporter:
+  enabled: false
+defaultRules:
+  create: false
