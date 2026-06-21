@@ -15,7 +15,7 @@ kubeScheduler:
 kubeProxy:
   enabled: false
 kubeStateMetrics:
-  enabled: false
+  enabled: true
 
 
 grafana:
