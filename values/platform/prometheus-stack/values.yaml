@@ -3,11 +3,11 @@ crds:
   enabled: false
 
 kubernetesServiceMonitors:
-  enabled: false
+  enabled: true
 kubeApiServer:
-  enabled: false
+  enabled: true
 kubeLet:
-  enabled: false
+  enabled: true
 kubeControllerManager:
   enabled: false
 kubeScheduler:
