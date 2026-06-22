@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: caddy-ingress
+  name: caddy
   namespace: reverse
   labels:
     app: caddy
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: caddy
-        image: docker/library/caddy:2.11.4-alpine
+        image: "docker/library/caddy:2.11.4-alpine"
         ports:
         - containerPort: 80
           name: http
@@ -47,7 +47,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: caddy-service
+  name: caddy
   namespace: reverse
 spec:
   type: ClusterIP
