@@ -29,7 +29,7 @@ args:
       - "quay.io/prometheus/alertmanager:v0.33.0"
       - "quay.io/prometheus/node-exporter:v1.11.1-distroless"
       - "quay.io/prometheus/prometheus:v3.12.0-distroless"
-      - "docker/library/caddy:2.11.4-alpine"
+      - "caddy:2.11.4-alpine"
     globalPublicKey: |
       -----BEGIN PUBLIC KEY-----
       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXBC/tG86ZkNXCMSODNnqWSv94czb
