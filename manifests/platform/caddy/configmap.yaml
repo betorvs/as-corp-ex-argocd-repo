@@ -1,0 +1,46 @@
+# caddy-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caddy-config
+  namespace: reverse
+  labels:
+    app: caddy
+data:
+  Caddyfile: |
+    {
+        log default {
+            output stdout
+            format json
+        }
+    }
+    prometheus-grafana.monitoring.svc.cluster.local {
+      tls /etc/caddy/certs/tls.crt /etc/caddy/certs/tls.key
+      handle {
+        reverse_proxy prometheus-grafana.monitoring:80
+      }
+    }
+    alertmanager-operated.monitoring.svc.cluster.local {
+      tls /etc/caddy/certs/tls.crt /etc/caddy/certs/tls.key
+      handle {
+        reverse_proxy prometheus-kube-prometheus-alertmanager.monitoring:9093
+      }
+    }
+    prometheus.monitoring.svc.cluster.local {
+      tls /etc/caddy/certs/tls.crt /etc/caddy/certs/tls.key
+      handle {
+        reverse_proxy prometheus-kube-prometheus-prometheus.monitoring:9090
+      }
+    }
+    vault.vault.svc.cluster.local {
+      tls /etc/caddy/certs/tls.crt /etc/caddy/certs/tls.key
+      handle {
+        reverse_proxy vault.vault:8200
+      }
+    }
+    caddy.reverse.svc.cluster.local {
+        tls /etc/caddy/certs/tls.crt /etc/caddy/certs/tls.key
+        handle {
+          respond "Welcome to caddy.reverse.svc.cluster.local" 200
+        }
+    }
