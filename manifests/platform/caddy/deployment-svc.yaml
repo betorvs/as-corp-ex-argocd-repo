@@ -33,9 +33,9 @@ spec:
           readOnly: true
         resources:
           limits:
-            memory: 128mb
+            memory: "128Mi"
           requests:
-            cpu: 50m
+            cpu: "50m"
       volumes:
       - name: config
         configMap:
