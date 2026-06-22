@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: caddy
-        image: "docker/library/caddy:2.11.4-alpine"
+        image: "caddy:2.11.4-alpine"
         ports:
         - containerPort: 80
           name: http
