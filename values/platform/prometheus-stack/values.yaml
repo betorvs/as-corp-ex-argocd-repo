@@ -28,3 +28,6 @@ grafana:
       jsonData:
         maxLines: 1000
         timeout: 60
+        httpHeaderName1: 'X-Scope-OrgID'
+      secureJsonData:
+        httpHeaderValue1: '1'
