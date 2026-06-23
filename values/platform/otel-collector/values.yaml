@@ -14,7 +14,7 @@ config:
       tls:
         insecure: true
   processors:
-    batch:
+    batch: {}
   receivers:
     jaeger: null
     prometheus: null
