@@ -1,29 +1,29 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: loki
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
-spec:
-  project: platform
-  sources:
-    - repoURL: 'https://github.com/betorvs/as-corp-ex-argocd-repo'
-      targetRevision: HEAD
-      ref: git-values
-    - chart: loki
-      repoURL: https://grafana-community.github.io/helm-charts
-      targetRevision: 17.4.7
-      helm:
-        releaseName: loki
-        valueFiles:
-          - $git-values/values/platform/loki/values.yaml
-  destination:
-    server: "https://kubernetes.default.svc"
-    namespace: logging
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: loki
+#   namespace: argocd
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "5"
+# spec:
+#   project: platform
+#   sources:
+#     - repoURL: 'https://github.com/betorvs/as-corp-ex-argocd-repo'
+#       targetRevision: HEAD
+#       ref: git-values
+#     - chart: loki
+#       repoURL: https://grafana-community.github.io/helm-charts
+#       targetRevision: 17.4.7
+#       helm:
+#         releaseName: loki
+#         valueFiles:
+#           - $git-values/values/platform/loki/values.yaml
+#   destination:
+#     server: "https://kubernetes.default.svc"
+#     namespace: logging
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
