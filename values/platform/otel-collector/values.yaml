@@ -4,7 +4,6 @@ image:
 presets:
   logsCollection:
     enabled: true
-    includeCollectorLogs: true
   kubernetesEvents:
     enabled: true
 config:
