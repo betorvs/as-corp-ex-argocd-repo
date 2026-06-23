@@ -1,8 +1,6 @@
 mode: daemonset
 image:
   repository: "otel/opentelemetry-collector-k8s"
-command:
-  name: "otelcol"
 presets:
   logsCollection:
     enabled: true
