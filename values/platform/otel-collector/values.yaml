@@ -11,6 +11,8 @@ config:
   exporters:
     otlphttp/logs:
       endpoint: "http://loki.logging:3100/otlp"
+      headers:
+        X-Scope-OrgID: "1"
       tls:
         insecure: true
   processors:
