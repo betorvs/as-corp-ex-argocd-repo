@@ -1,0 +1,42 @@
+mode: daemonset
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+command:
+  name: "otelcol"
+presets:
+  logsCollection:
+    enabled: true
+    includeCollectorLogs: true
+  kubernetesEvents:
+    enabled: true
+config:
+  exporters:
+    otlphttp/logs:
+      endpoint: "http://loki.logging:3100/otlp"
+      tls:
+        insecure: true
+  processors:
+    batch:
+  receivers:
+    jaeger: null
+    prometheus: null
+    zipkin: null
+    otlp:
+      protocols:
+        grpc:
+          endpoint: ${env:MY_POD_IP}:4317
+        http:
+          endpoint: ${env:MY_POD_IP}:4318
+  service:
+    pipelines:
+      traces:
+        receivers:
+          - otlp
+      metrics: null
+      logs:
+        exporters:
+          - otlphttp/logs
+        receivers:
+          - otlp
+        processors:
+          - batch
